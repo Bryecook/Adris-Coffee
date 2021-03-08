@@ -1,7 +1,7 @@
 
 City.destroy_all
-Locations.destroy_all
-Drinks.destroy_all
+Location.destroy_all
+Drink.destroy_all
 Client.destroy_all
 Order.destroy_all
 
@@ -19,11 +19,11 @@ latte = Drink.create(name: "Latte", price: 5)
 cappuccino = Drink.create(name: "Cappuccino", price: 5)
 espresso = Drink.create(name: "Espresso", price: 4)
 
-client1 = Client.create(name: "Adritorres", password: "ilovemycat")
-client2 = Client.create(name: "Bryecook", password: "musicislife")
-client3 = Client.create(name: "Angelo", password: "dopeshirt")
-client4 = Client.create(name: "Nestor", password: "stayhydrated")
-client5 = Client.create(name: "Raul", password: "onthatnote")
+client1 = Client.create(username: "Adritorres", password: "ilovemycat")
+client2 = Client.create(username: "Bryecook", password: "musicislife")
+client3 = Client.create(username: "Angelo", password: "dopeshirt")
+client4 = Client.create(username: "Nestor", password: "stayhydrated")
+client5 = Client.create(username: "Raul", password: "onthatnote")
 
 order1 = Order.create(client_id: client1.id, drink_id: latte.id, location_id: south_austin.id)
 order2 = Order.create(client_id: client2.id, drink_id: americano.id, location_id: north_austin.id)
