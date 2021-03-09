@@ -3,7 +3,6 @@ require 'pry'
 require "tty-prompt"
 require 'colorize'
 
-
 def welcome 
     title = Artii::Base.new(:font => "big")
     puts "Welcome to:"
@@ -18,15 +17,12 @@ def welcome
   |               |_| |
 ___|             |\___/
 /    \___________/    \
-
 \_____________________/
-
 ".colorize(:red)
-
-
 end 
 
 def login_create
+client_object=nil
 clients = Client.all.map {|client| client.username}
 logged_in = false
     prompt = TTY::Prompt.new
@@ -38,6 +34,7 @@ logged_in = false
             current_password = prompt.mask("What is your password?") 
             if Client.all.select {|client| client.username==current_username}.first.password==current_password
                 logged_in=true
+                client_object=Client.all.select {|client| client.username==current_username}
                 puts ("Hello #{current_username}, what would you like to drink?")
             else 
                 forgot_password = prompt.select("Incorrect password. Did you forget your password?", ["Yes", "No"])
@@ -79,15 +76,15 @@ logged_in = false
         end 
         end
         new_password = prompt.mask("Password")
-        Client.create(username: new_username, password: new_password)
+        client_object=Client.create(username: new_username, password: new_password, balance: 0, rewards: 0)
             puts "Welcome #{new_username}, what would you like to drink?"
             logged_in=true
     else 
         exit!
     end
     end
+    client_object
 end  
-
 
 def place_an_order
     drinks = Drink.all.map {|drink| drink.name }
@@ -105,10 +102,33 @@ def place_an_order
     exit!
 end
 
+def add_money(client)
+    prompt = TTY::Prompt.new
+    add_money = prompt.select("Select an amount to add to your account", ["15", "25", "Other"])
+    if (add_money == "15")
+    client.balance += 15
+elsif (add_money == "25")
+    client.balance += 25
+else 
+    puts "Enter an amount"
+    client.balance = gets.to_i
+end 
+end 
 
-welcome
-login_create
-place_an_order
+
+def add_rewards(client, drink)
+    client.rewards += drink.price
+    "You collected #{drink.price} points!"
+end 
+
+client_object=login_create
+#binding.pry
+client1 = Client.create(username: "Luca", password: "bottle", balance: 0, rewards: 0)
+mocha = Drink.create(name: "Mocha", price: 3)
+
+# add_rewards(client1, mocha)
 
 
-# binding.pry
+binding.pry
+0
+
