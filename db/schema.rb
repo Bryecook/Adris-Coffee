@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(version: 2021_03_08_202137) do
   create_table "clients", force: :cascade do |t|
     t.string "username"
     t.string "password"
+    t.integer "balance"
+    t.integer "rewards"
   end
 
   create_table "drinks", force: :cascade do |t|
