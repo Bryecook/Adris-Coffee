@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2021_03_08_202137) do
   create_table "drinks", force: :cascade do |t|
     t.string "name"
     t.integer "price"
+    t.integer "reward_cost"
   end
 
   create_table "locations", force: :cascade do |t|

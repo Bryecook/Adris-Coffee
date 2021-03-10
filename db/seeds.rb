@@ -14,10 +14,10 @@ north_austin = Location.create(name: "North", address: "1700 W Parmer Ln", city_
 south_houston = Location.create(name: "South", address: "1035 N Shepard Dr", city_id: houston.id)
 north_houston = Location.create(name: "North", address: "5820 W. Sam Houston Pkwy ", city_id: houston.id)
 
-americano = Drink.create(name: "Americano", price: 3)
-latte = Drink.create(name: "Latte", price: 5)
-cappuccino = Drink.create(name: "Cappuccino", price: 5)
-espresso = Drink.create(name: "Espresso", price: 4)
+americano = Drink.create(name: "Americano", price: 3, reward_cost: 30)
+latte = Drink.create(name: "Latte", price: 5, reward_cost: 50)
+cappuccino = Drink.create(name: "Cappuccino", price: 5, reward_cost: 50)
+espresso = Drink.create(name: "Espresso", price: 4, reward_cost: 40)
 
 client1 = Client.create(username: "Adritorres", password: "ilovemycat", balance: 0)
 client2 = Client.create(username: "Bryecook", password: "musicislife", balance: 0, rewards:0)

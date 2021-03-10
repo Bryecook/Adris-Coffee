@@ -121,54 +121,87 @@ def add_money(client)
     end 
 end 
 
-
-def add_rewards(client, drink)
-    client.rewards += drink.price
-    "You collected #{drink.price} points!"
-end 
-
-#binding.pry
-client1 = Client.create(username: "Luca", password: "bottle", balance: 0, rewards: 0)
-mocha = Drink.create(name: "Mocha", price: 3)
-
-# add_rewards(client1, mocha)
-
-
 def add_to_cart
-    drinks = Drink.all.map {|drink| drink.name}
-    prompt = TTY::Prompt.new
-    drink_option = prompt.select("Select your Coffee:", drinks)
-
-
-def place_an_order(client)
+    drink_object=nil
     drinks = Drink.all.map {|drink| drink.name }
     prompt = TTY::Prompt.new
-    # loop do
     drink_option = prompt.select("Select your Coffee:", drinks)
-    binding.pry
-    drink=Drink.all.select {|drink| drink.name == drink_option}.first
-        if client.balance >= drink.price
-        client.balance -= drink.price
-        puts ("Enjoy your #{drink_option}!").colorize(:yellow)
-        #current_order = >>> I've tried different ways to save the drink ordered but still not working, need to come back to it 
+    drink_object=Drink.all.select {|drink| drink.name == drink_option}.first
+    puts ("One #{drink_option} coming right up!").colorize(:yellow)
+    drink_object 
+end
+
+def order_purchase(client, drink, location)
+    order_object=nil
+    loop do
+        prompt = TTY::Prompt.new
+        selection=prompt.select("How would you like to purchase your drink?", ["With account balance", "With rewards balance", "Exit/cancel order"])
+        if selection=="With account balance"
+            puts "Checking account balance..."
+            if client.balance >= drink.price
+                new_balance = client.balance - drink.price
+                client.update(balance: new_balance)
+                new_reward_balance = client.rewards + drink.price
+                client.update(rewards: new_reward_balance)
+                puts "Purchase successful! You have $#{client.balance} left in your account."
+                puts "You have also earned #{drink.price} more reward points and have a total of #{client.rewards}!"
+                break
+            else
+                prompt = TTY::Prompt.new
+                balance_selection=prompt.select("Insufficient funds. Would you like to:", ["Add funds to account", "Go back to purchase menu", "Exit/cancel order"])
+                if balance_selection == "Add funds to account"
+                    add_money(client)
+                elsif balance_selection == "Go back to purchase menu"
+                
+                else 
+                    puts "Goodbye! Hope to see you again soon"
+                    exit!
+                end
+            end
+        elsif selection == "With rewards balance"
+            if client.rewards >= drink.reward_cost
+                new_reward_balance = client.rewards - drink.reward_cost
+                client.update(rewards: new_reward_balance)
+                puts "Purchase successful! Your new reward balance is #{client.rewards}"
+                break
+            else
+                more_points_needed = drink.reward_cost - client.rewards
+                puts "Insufficient reward balance. You need #{more_points_needed} more reward points to make this purchase."
+            end
         else
-        puts ("Please check your account balance and try again.").colorize(:yellow)
-        #add_money(client_object)
-        ##can we call a method inside another method? 
+            puts "Goodbye! Hope to see you again soon!"
+            exit!
         end
-    menu_options = prompt.select("Would you like to add another drink to your order?", ["Yes", "No, thank you. Sign out"])
-        if menu_options == "Yes"
-          #neeeds to add a loop to go to the beginning of the method
-          #if we want the order receipt you mentioned, we will need to save the drink ordered before it loops back, so we have all the drinks 
-          #maybe we can create a variable called current_order and save the drinks (I was working on it, line 99) 
-        elsif menu_options == "No, thank you. Sign out"
-            puts ("We are working on your order!").colorize(:yellow)
-            title = Artii::Base.new(:font => "big")
-            puts title.asciify("Thank you!").colorize(:green)
-        end
-        exit!
     end
-    # end
+    order_object = Order.create(client_id: client.id, location_id: location.id, drink_id: drink.id)
+    ready= rand(10..20)
+    puts "Your order and receipt number is #{order_object.id}. Your order will be ready in #{ready} minutes!"
+    order_object
+end
+
+def add_a_tip(client)
+    prompt = TTY::Prompt.new
+    tip = prompt.select("Would you like to add a tip?", ["$1", "$2", "No, thank you"])
+    if (tip == "$1")
+        if client.balance >= 1
+        client.balance -= 1
+        client.update(balance: client.balance)
+        puts ("We are working on your order").colorize(:yellow)
+        else
+            puts "Insufficient funds"
+        end 
+    elsif (tip == "$2")
+        if client.balance >= 2
+            client.balance -= 2
+            client.update(balance: client.balance)
+            puts ("We are working on your order").colorize(:yellow)
+        else 
+                puts "Insufficient funds"
+        end
+    else 
+        puts ("We are working on your order").colorize(:yellow)
+    end 
+end 
 
 welcome
 client_object=login_create
@@ -190,12 +223,8 @@ loop do
         end
     end 
 drink_object=add_to_cart
-#output of the object 
-order_purchase(client_object_id, location_object_id, drink_object_id)
-#make the order object with location,client,drink ids
-#verifies balance >= drink price/gives option to add funds if not enough funds in balance
-#updates reward points
-#prints out order_id as the receipt.
+order_purchase(client_object, drink_object, location_object)
+add_a_tip(client_object)
 
 
 binding.pry
