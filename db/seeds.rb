@@ -20,7 +20,7 @@ cappuccino = Drink.create(name: "Cappuccino", price: 5)
 espresso = Drink.create(name: "Espresso", price: 4)
 
 client1 = Client.create(username: "Adritorres", password: "ilovemycat", balance: 0)
-client2 = Client.create(username: "Bryecook", password: "musicislife", balance: 0)
+client2 = Client.create(username: "Bryecook", password: "musicislife", balance: 0, rewards:0)
 client3 = Client.create(username: "Angelo", password: "dopeshirt", balance: 0)
 client4 = Client.create(username: "Nestor", password: "stayhydrated", balance: 0)
 client5 = Client.create(username: "Raul", password: "onthatnote", balance: 0)
