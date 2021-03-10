@@ -86,21 +86,21 @@ logged_in = false
     client_object
 end  
 
-def place_an_order
-    drinks = Drink.all.map {|drink| drink.name }
-    prompt = TTY::Prompt.new
-    drink_option = prompt.select("Select your Coffee:", drinks)
-    puts ("Enjoy your #{drink_option}!").colorize(:yellow)
-    menu_options = prompt.select("Would you like to add another drink to your order?", ["Yes", "No, thank you. Sign out"])
-    if menu_options == "Yes"
-      place_an_order
-    else
-        puts ("We are working on your order!").colorize(:yellow)
-    title = Artii::Base.new(:font => "big")
-    puts title.asciify("Thank you!").colorize(:green)
-    end
-    exit!
-end
+# def place_an_order
+#     drinks = Drink.all.map {|drink| drink.name }
+#     prompt = TTY::Prompt.new
+#     drink_option = prompt.select("Select your Coffee:", drinks)
+#     puts ("Enjoy your #{drink_option}!").colorize(:yellow)
+#     menu_options = prompt.select("Would you like to add another drink to your order?", ["Yes", "No, thank you. Sign out"])
+#     if menu_options == "Yes"
+#       place_an_order
+#     else
+#         puts ("We are working on your order!").colorize(:yellow)
+#     title = Artii::Base.new(:font => "big")
+#     puts title.asciify("Thank you!").colorize(:green)
+#     end
+#     exit!
+# end
 
 def add_money(client)
     prompt = TTY::Prompt.new
@@ -121,12 +121,44 @@ def add_rewards(client, drink)
     "You collected #{drink.price} points!"
 end 
 
-client_object=login_create
+client_object=login_create.first
 #binding.pry
 client1 = Client.create(username: "Luca", password: "bottle", balance: 0, rewards: 0)
 mocha = Drink.create(name: "Mocha", price: 3)
 
 # add_rewards(client1, mocha)
+
+
+def place_an_order(client)
+    drinks = Drink.all.map {|drink| drink.name }
+    prompt = TTY::Prompt.new
+    # loop do
+    drink_option = prompt.select("Select your Coffee:", drinks)
+    binding.pry
+    drink=Drink.all.select {|drink| drink.name == drink_option}.first
+        if client.balance >= drink.price
+        client.balance -= drink.price
+        puts ("Enjoy your #{drink_option}!").colorize(:yellow)
+        #current_order = >>> I've tried different ways to save the drink ordered but still not working, need to come back to it 
+        else
+        puts ("Please check your account balance and try again.").colorize(:yellow)
+        #add_money(client_object)
+        ##can we call a method inside another method? 
+        end
+    menu_options = prompt.select("Would you like to add another drink to your order?", ["Yes", "No, thank you. Sign out"])
+        if menu_options == "Yes"
+          #neeeds to add a loop to go to the beginning of the method
+          #if we want the order receipt you mentioned, we will need to save the drink ordered before it loops back, so we have all the drinks 
+          #maybe we can create a variable called current_order and save the drinks (I was working on it, line 99) 
+        elsif menu_options == "No, thank you. Sign out"
+            puts ("We are working on your order!").colorize(:yellow)
+            title = Artii::Base.new(:font => "big")
+            puts title.asciify("Thank you!").colorize(:green)
+        end
+        exit!
+    end
+    # end
+binding.pry
 
 
 binding.pry
