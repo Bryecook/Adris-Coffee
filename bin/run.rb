@@ -88,6 +88,29 @@ logged_in = false
     client_object
 end  
 
+def order_history(client)
+    prompt = TTY::Prompt.new
+    selection = prompt.select("Would you like to create a new order or view order history?", ["New order", "View order history"])
+    if selection == "New order"
+        puts "Let's create a new order!"
+    else
+        client.orders
+        location= Location.all.select {|location| location.id==client.orders.last.location_id}.first
+        city= City.all.select {|city| city.id==location.city_id}.first
+        drink= Drink.all.select {|drink| drink.id==client.orders.last.drink_id}.first
+        puts "You have placed #{client.orders.count} orders with us. Your last order number was #{client.orders.last.id} at our #{location.name} #{city.name} location. You ordered a #{drink.name} for $#{drink.price}."
+        #binding.pry
+        prompt = TTY::Prompt.new
+        second_selection = prompt.select("Would you like to create a new order or exit/sign out?", ["New order", "Exit/Sign out"])
+        if second_selection == "New order"
+            puts "Let's create a new order!"
+        else
+            puts "Thank you! Hope to see you again soon!"
+            exit!
+        end
+    end
+end
+
 def location_selection
     location_object=nil
     cities=City.all.map {|city| city.name}
@@ -233,6 +256,7 @@ end
 
 welcome
 client_object=login_create
+order_history(client_object)
 location_object=location_selection
 loop do
     prompt = TTY::Prompt.new
@@ -256,4 +280,5 @@ add_a_tip(client_object)
 cancel_order(order_object)
 title = Artii::Base.new(:font => "big")
     puts title.asciify("Thank you!").colorize(:green)
-
+binding.pry
+0
