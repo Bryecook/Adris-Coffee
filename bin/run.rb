@@ -211,6 +211,24 @@ def add_a_tip(client)
         puts ("We are working on your order").colorize(:yellow)
     end 
 end 
+
+def cancel_order(order)
+    prompt = TTY::Prompt.new
+    selection=prompt.select("Thank you for your business. You may now exit or cancel order.", ["Exit/Sign out", "Cancel order"])
+    if selection == "Exit/Sign out"
+        puts "Goodbye! See you at the store!"
+    else
+        puts "Your order has been canceled. Please call our customer service line to be issued a refund."
+        # drinkid=order.drink_id
+        # drink_selection=Drink.all.select{|drink| drink.id==drinkid}.first
+        # clientid=order.client_id
+        # client_selection=Client.all.select{|client| client.id==clientid}.first
+        # refund= client_selection.balance + drink_selection.price
+        # client_selection.update(balance: refund)
+        Order.delete(order.id)
+        exit!
+    end
+end
     
 
 welcome
@@ -233,10 +251,9 @@ loop do
         end
     end 
 drink_object=add_to_cart
-order_purchase(client_object, drink_object, location_object)
+order_object=order_purchase(client_object, drink_object, location_object)
 add_a_tip(client_object)
+cancel_order(order_object)
 title = Artii::Base.new(:font => "big")
     puts title.asciify("Thank you!").colorize(:green)
-
-
 
