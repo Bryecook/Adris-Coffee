@@ -12,12 +12,12 @@ def welcome
    ( )  (    ) )
    _____________
   <_____________> ___
-  |             |/ _ \
-  |               | | |
-  |               |_| |
-___|             |\___/
-/    \___________/    \
-\_____________________/
+  |             |/ _ |
+  |               | ||
+  |               |_||
+  |             |\___/
+   | ___________/    
+
 ".colorize(:red)
 end 
 
@@ -35,7 +35,7 @@ logged_in = false
             if Client.all.select {|client| client.username==current_username}.first.password==current_password
                 logged_in=true
                 client_object=Client.all.select {|client| client.username==current_username}.first
-                puts ("Hello #{current_username}, what would you like to drink?")
+                puts ("Hello #{current_username}, Where would you like to go to?").colorize(:yellow)
             else 
                 forgot_password = prompt.select("Incorrect password. Did you forget your password?", ["Yes", "No"])
                     if forgot_password == "Yes"
@@ -76,7 +76,7 @@ logged_in = false
             end
             
         end
-        binding.pry
+       
         new_password = prompt.mask("Password")
         client_object=Client.create(username: new_username, password: new_password, balance: 0, rewards: 0)
             puts "Welcome #{new_username}, what would you like to drink?"
@@ -101,7 +101,7 @@ def location_selection
         location_choice = prompt.select("Please select a location:", location_names)
     end
     location_object=Location.all.select {|location| location.name==location_choice}.first
-    puts "You have selected #{location_choice} in #{city_choice}! Now it's time to pick your drinks!"
+    puts ("You have selected #{location_choice} in #{city_choice}! Now it's time to pick your drink!").colorize(:yellow)
     location_object
 end
 
@@ -115,7 +115,7 @@ def add_money(client)
         client.balance += 25
         client.update(balance: client.balance)
     else 
-        puts "Enter an amount"
+        puts ("Enter an amount").colorize(:yellow)
         client.balance = gets.to_i
         client.update(balance: client.balance)
     end 
@@ -124,12 +124,21 @@ end
 def add_to_cart
     drink_object=nil
     drinks = Drink.all.map {|drink| drink.name }
+    options = Drink.all.map {|drink| drink.name }
+    options << "Exit/Sign Out"
     prompt = TTY::Prompt.new
-    drink_option = prompt.select("Select your Coffee:", drinks)
-    drink_object=Drink.all.select {|drink| drink.name == drink_option}.first
-    puts ("One #{drink_option} coming right up!").colorize(:yellow)
-    drink_object 
+    drink_option = prompt.select("Select your Coffee:", options)   
+    if  drinks.include?(drink_option)
+        drink_object=Drink.all.select {|drink| drink.name == drink_option}.first
+        puts ("One #{drink_option} coming right up!").colorize(:yellow)
+        drink_object 
+    else 
+        options == "Exit/Sign Out"
+        puts ("Goodbye! Hope to see you again soon").colorize(:yellow)
+        exit!
+end 
 end
+
 
 def order_purchase(client, drink, location)
     order_object=nil
@@ -137,14 +146,14 @@ def order_purchase(client, drink, location)
         prompt = TTY::Prompt.new
         selection=prompt.select("How would you like to purchase your drink?", ["With account balance", "With rewards balance", "Exit/cancel order"])
         if selection=="With account balance"
-            puts "Checking account balance..."
+            puts ("Checking account balance...").colorize(:yellow)
             if client.balance >= drink.price
                 new_balance = client.balance - drink.price
                 client.update(balance: new_balance)
                 new_reward_balance = client.rewards + drink.price
                 client.update(rewards: new_reward_balance)
-                puts "Purchase successful! You have $#{client.balance} left in your account."
-                puts "You have also earned #{drink.price} more reward points and have a total of #{client.rewards}!"
+                puts ("Purchase successful! You have $#{client.balance} left in your account.").colorize(:yellow)
+                puts ("You have also earned #{drink.price} more reward points and have a total of #{client.rewards}!").colorize(:yellow)
                 break
             else
                 prompt = TTY::Prompt.new
@@ -162,20 +171,20 @@ def order_purchase(client, drink, location)
             if client.rewards >= drink.reward_cost
                 new_reward_balance = client.rewards - drink.reward_cost
                 client.update(rewards: new_reward_balance)
-                puts "Purchase successful! Your new reward balance is #{client.rewards}"
+                puts ("Purchase successful! Your new reward balance is #{client.rewards}").colorize(:yellow)
                 break
             else
                 more_points_needed = drink.reward_cost - client.rewards
-                puts "Insufficient reward balance. You need #{more_points_needed} more reward points to make this purchase."
+                puts ("Insufficient reward balance. You need #{more_points_needed} more reward points to make this purchase.").colorize(:yellow)
             end
         else
-            puts "Goodbye! Hope to see you again soon!"
+            puts ("Goodbye! Hope to see you again soon!").colorize(:yellow)
             exit!
         end
     end
     order_object = Order.create(client_id: client.id, location_id: location.id, drink_id: drink.id)
     ready= rand(10..20)
-    puts "Your order and receipt number is #{order_object.id}. Your order will be ready in #{ready} minutes!"
+    puts ("Your order and receipt number is #{order_object.id}. Your order will be ready in #{ready} minutes!").colorize(:yellow)
     order_object
 end
 
@@ -202,6 +211,7 @@ def add_a_tip(client)
         puts ("We are working on your order").colorize(:yellow)
     end 
 end 
+    
 
 welcome
 client_object=login_create
@@ -212,12 +222,12 @@ loop do
         if selection=="Place order"
             break
         elsif selection=="Check balance"
-            puts "Your balance is $#{client_object.balance}."
+            puts ("Your balance is $#{client_object.balance}.").colorize(:yellow)
         elsif selection=="Check reward balance"
-            puts "Your reward balance is #{client_object.rewards}."
+            puts ("Your reward balance is #{client_object.rewards}.").colorize(:yellow)
         elsif selection=="Add funds"
             add_money(client_object)
-            puts "Your new balance is $#{client_object.balance}."
+            puts ("Your new balance is $#{client_object.balance}.").colorize(:yellow)
         else
             exit!
         end
@@ -225,11 +235,8 @@ loop do
 drink_object=add_to_cart
 order_purchase(client_object, drink_object, location_object)
 add_a_tip(client_object)
+title = Artii::Base.new(:font => "big")
+    puts title.asciify("Thank you!").colorize(:green)
 
 
-binding.pry
-
-
-binding.pry
-0
 
