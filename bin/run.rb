@@ -5,7 +5,7 @@ require 'colorize'
 
 def welcome 
     title = Artii::Base.new(:font => "big")
-    puts "Welcome to:"
+    puts ("Welcome to:").colorize(:green)
     puts title.asciify("Adri's Coffee").colorize(:green)
    puts "  (  )   (   )  )
    ) (   )  (  (
@@ -35,7 +35,7 @@ logged_in = false
             if Client.all.select {|client| client.username==current_username}.first.password==current_password
                 logged_in=true
                 client_object=Client.all.select {|client| client.username==current_username}.first
-                puts ("Hello #{current_username}, Where would you like to go to?").colorize(:yellow)
+                puts ("Hello #{current_username}!").colorize(:yellow)
             else 
                 forgot_password = prompt.select("Incorrect password. Did you forget your password?", ["Yes", "No"])
                     if forgot_password == "Yes"
@@ -79,7 +79,7 @@ logged_in = false
        
         new_password = prompt.mask("Password")
         client_object=Client.create(username: new_username, password: new_password, balance: 0, rewards: 0)
-            puts "Welcome #{new_username}, what would you like to drink?"
+            puts ("Welcome #{new_username}, what would you like to drink?").colorize(:yellow)
             logged_in=true
     else 
         exit!
@@ -92,23 +92,27 @@ def order_history(client)
     prompt = TTY::Prompt.new
     selection = prompt.select("Would you like to create a new order or view order history?", ["New order", "View order history"])
     if selection == "New order"
-        puts "Let's create a new order!"
+        puts ("Let's create a new order! Where would you like to go to?").colorize(:yellow)
     else
+        if client.orders.count != 0
         client.orders
         location= Location.all.select {|location| location.id==client.orders.last.location_id}.first
         city= City.all.select {|city| city.id==location.city_id}.first
         drink= Drink.all.select {|drink| drink.id==client.orders.last.drink_id}.first
-        puts "You have placed #{client.orders.count} orders with us. Your last order number was #{client.orders.last.id} at our #{location.name} #{city.name} location. You ordered a #{drink.name} for $#{drink.price}."
+        puts ("You have placed #{client.orders.count} orders with us. Your last order number was #{client.orders.last.id} at our #{location.name} #{city.name} location. You ordered a #{drink.name} for $#{drink.price}.").colorize(:yellow)
         #binding.pry
         prompt = TTY::Prompt.new
         second_selection = prompt.select("Would you like to create a new order or exit/sign out?", ["New order", "Exit/Sign out"])
         if second_selection == "New order"
-            puts "Let's create a new order!"
+            puts ("Let's create a new order!").colorize(:yellow)
         else
-            puts "Thank you! Hope to see you again soon!"
+            puts ("Thank you! Hope to see you again soon!").colorize(:yellow)
             exit!
         end
+    else 
+        puts ("No items in order history").colorize(:yellow)
     end
+end 
 end
 
 def location_selection
@@ -186,7 +190,7 @@ def order_purchase(client, drink, location)
                 elsif balance_selection == "Go back to purchase menu"
                 
                 else 
-                    puts "Goodbye! Hope to see you again soon"
+                    puts ("Goodbye! Hope to see you again soon").colorize(:yellow)
                     exit!
                 end
             end
@@ -239,15 +243,9 @@ def cancel_order(order)
     prompt = TTY::Prompt.new
     selection=prompt.select("Thank you for your business. You may now exit or cancel order.", ["Exit/Sign out", "Cancel order"])
     if selection == "Exit/Sign out"
-        puts "Goodbye! See you at the store!"
+        puts ("Goodbye! See you at the store!").colorize(:yellow)
     else
-        puts "Your order has been canceled. Please call our customer service line to be issued a refund."
-        # drinkid=order.drink_id
-        # drink_selection=Drink.all.select{|drink| drink.id==drinkid}.first
-        # clientid=order.client_id
-        # client_selection=Client.all.select{|client| client.id==clientid}.first
-        # refund= client_selection.balance + drink_selection.price
-        # client_selection.update(balance: refund)
+        puts ("Your order has been canceled. Please call our customer service line to be issued a refund.").colorize(:yellow)
         Order.delete(order.id)
         exit!
     end
@@ -271,6 +269,7 @@ loop do
             add_money(client_object)
             puts ("Your new balance is $#{client_object.balance}.").colorize(:yellow)
         else
+            puts ("Goodbye! Hope to see you again soon!").colorize(:yellow)
             exit!
         end
     end 
@@ -280,5 +279,5 @@ add_a_tip(client_object)
 cancel_order(order_object)
 title = Artii::Base.new(:font => "big")
     puts title.asciify("Thank you!").colorize(:green)
-binding.pry
+# binding.pry
 0
